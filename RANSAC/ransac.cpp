@@ -10,10 +10,10 @@ using namespace cv;
 #define WITHOUT_POINT_NUM 50
 #define MAX_POINT_NUM 220
 
-RNG rng((unsigned)time(NULL));
+RNG rng((unsigned)time(NULL));//äº§ç”Ÿéšæœºæ•°
 
 
-/*×îĞ¡¶ş³Ë·¨*/
+/*æœ€å°äºŒä¹˜æ³•*/
 void least_squests(vector<Point2f> a, float *k, float *b)
 {
 	int n = a.size();
@@ -21,7 +21,7 @@ void least_squests(vector<Point2f> a, float *k, float *b)
 	double sum_y = 0;
 	double sum_xy = 0;
 	double sum_xx = 0;
-	/*1¡¢¼ÆËãÀÛ¼ÓºÍ*/
+	/*1ã€è®¡ç®—ç´¯åŠ å’Œ*/
 	for (int i = 0; i < n; i++)
 	{
 		sum_x += a[i].x;
@@ -29,7 +29,7 @@ void least_squests(vector<Point2f> a, float *k, float *b)
 		sum_xy += a[i].x * a[i].y;
 		sum_xx += a[i].x * a[i].x;
 	}
-	/*2¡¢ÇóĞ±ÂÊkºÍ½Ø¾àb*/
+	/*2ã€æ±‚æ–œç‡kå’Œæˆªè·b*/
 	*k = (sum_xy * n - sum_x * sum_y) / (n * sum_xx - sum_x * sum_x);
 	*b = (sum_y - *k * sum_x) / n;
 }
@@ -38,13 +38,13 @@ void least_squests(vector<Point2f> a, float *k, float *b)
 void ransaca(vector<Point2f> a, float *k, float *b)
 {
 	const int N = 20;
-	const int M = 300;
+	const int M = 1000;//æ‹Ÿåˆæ¬¡æ•°
 	const int THRESHOLD = 50;
 	int within_group[M] = { 0 };
 	float within_max = 0;
 	for (int n = 0; n < M; n++)
 	{
-		/*1¡¢´ÓaÖĞËæ»úÈ¡N¸öµã*/
+		/*1ã€ä»aä¸­éšæœºå–Nä¸ªç‚¹ï¼Œå½“ä½œå†…ç¾¤*/
 		vector<Point2f>p_b;
 		for (int i = 0; i < N; i++)
 		{
@@ -52,11 +52,11 @@ void ransaca(vector<Point2f> a, float *k, float *b)
 			//cout << j << " ";
 			p_b.push_back(a[j]);
 		}
-		/*2¡¢ÓÃ×îĞ¡¶ş³Ë·¨ÄâºÏµÚÒ»²½Ëæ»úÈ¡µÄN¸öµã*/
+		/*2ã€ç”¨æœ€å°äºŒä¹˜æ³•æ‹Ÿåˆç¬¬ä¸€æ­¥éšæœºå–çš„Nä¸ªç‚¹*/
 		float k_tmp = 0, b_tmp = 0;
 		least_squests(p_b, &k_tmp, &b_tmp);
 
-		/*3¡¢¼ÆËãÉú³ÉµÄ²ÎÊıÓĞ¶àÉÙ¸öÄÚÈºµã*/
+		/*3ã€è®¡ç®—ç”Ÿæˆçš„å‚æ•°æœ‰å¤šå°‘ä¸ªå†…ç¾¤ç‚¹*/
 		for (int m = 0; m < MAX_POINT_NUM; m++)
 		{
 			if (abs(a[m].y - (k_tmp * a[m].x + b_tmp)) < THRESHOLD)
@@ -64,8 +64,8 @@ void ransaca(vector<Point2f> a, float *k, float *b)
 				within_group[n]++;
 			}
 		}
-		cout << "µÚ" << n + 1 << "´ÎÄâºÏµÄ²ÎÊı£º" << "k = " << k_tmp << " b = " << b_tmp << " ÄÚÈºµãÊıÁ¿:" << within_group[n] << endl;
-		/*4¡¢ÕÒ³ö×î´óÊıÁ¿ÄÚÈºµãµÄkºÍb*/
+		cout << "ç¬¬" << n + 1 << "æ¬¡æ‹Ÿåˆçš„å‚æ•°ï¼š" << "k = " << k_tmp << " b = " << b_tmp << " å†…ç¾¤ç‚¹æ•°é‡:" << within_group[n] << endl;
+		/*4ã€æ‰¾å‡ºæœ€å¤§æ•°é‡å†…ç¾¤ç‚¹çš„kå’Œb*/
 		if (within_max < within_group[n])
 		{
 			within_max = within_group[n];
@@ -75,50 +75,54 @@ void ransaca(vector<Point2f> a, float *k, float *b)
 	}
 }
 
-
-
-
-
 int main(void)
 {
 	vector<Point2f> a;
 	Point2f p_a;
 	for (int i = 0; i < WITHOUT_POINT_NUM; i++)
-	{
-		p_a.x = rng.uniform(1, 800);
-		p_a.y = rng.uniform(1, 100);
+	{//äº§ç”Ÿéšæœºåæ ‡ç‚¹
+		p_a.x = rng.uniform(1, 800);//ä»£è¡¨åˆ—
+		p_a.y = rng.uniform(250, 650);//ä»£è¡¨è¡Œ
 		a.push_back(p_a);
 	}
 	for (int i = 0; i < MAX_POINT_NUM - WITHOUT_POINT_NUM; i++)
 	{
 		p_a.x = rng.uniform(1, 800);
-		p_a.y = rng.uniform(500, 600);
+		p_a.y = rng.uniform(400, 500);
 		a.push_back(p_a);
 	}
+	cout << "vector size:" << a.size() << endl;
 	float k = 0, b = 0;
 	least_squests(a, &k, &b);
 	cout << "k = " << k << " b = " << b << endl;
-	Mat img = Mat::zeros(Size(800, 800), CV_8UC3);
+
+	//åˆ›å»ºç©ºç™½å›¾åƒ
+	Mat img = Mat::zeros(Size(800, 800), CV_8UC3);//CV_8UC3:   8->8bit,U->unsigned int,C->channel,3->number of channel
 	for (int i = 0; i < a.size(); i++)
 	{
 		//circle(img, a[i], 1, Scalar(201, 34, 234), CV_FILLED);
-		circle(img, a[i], 1, Scalar(201, 34, 234));
+		//åœ¨å›¾åƒä¸Šç”»åœˆï¼Œï¼ˆå›¾åƒï¼Œåæ ‡ï¼ŒåŠå¾„ï¼‰
+		circle(img, a[i], 1, Scalar(56, 133, 190));
 	}
-	Point2f a1, a2;
+	Point2f a1, a2;//éšæœºé€‰ä¸¤ä¸ªç‚¹ï¼Œå…ˆç»˜åˆ¶ä¸€æ¡çº¿
+/*
 	a1.x = 34.8;
 	a2.x = 787.9;
 	a1.y = k * a1.x + b;
 	a2.y = k * a2.x + b;
-	line(img, a1, a2, Scalar(0, 0, 255));
-	putText(img, "least squests", a1, 3, 1.5, Scalar(0, 0, 255));
+	//ç”»çº¿
+	line(img, a1, a2, Scalar(255, 0, 0));
+	//è¾“å‡ºæ–‡æœ¬ï¼›ï¼ˆå¾…è¾“å‡ºçš„å›¾åƒï¼Œæ–‡æœ¬ï¼Œæ–‡æœ¬å·¦ä¸‹è§’åœ¨å›¾åƒçš„ä½ç½®ï¼Œå­—ä½“ï¼Œç²—ç»†ï¼Œè‰²å½©ï¼‰
+	putText(img, "least squests", a1, FONT_HERSHEY_PLAIN, 3, Scalar(255, 0, 0));
+	*/
 	ransaca(a, &k, &b);
+
 	a1.x = 34.8;
 	a2.x = 787.9;
 	a1.y = k * a1.x + b;
 	a2.y = k * a2.x + b;
-	line(img, a1, a2, Scalar(255, 255, 255));
-
-	putText(img, "ransaca", a1, 3, 1.5, Scalar(255, 255, 255));
+	line(img, a1, a2, Scalar(0, 255, 0));
+	putText(img, "ransaca-1000times", a1, 1, 3, Scalar(0, 255, 0));
 	imshow("img", img);
 	waitKey(0);
 	system("pause");
