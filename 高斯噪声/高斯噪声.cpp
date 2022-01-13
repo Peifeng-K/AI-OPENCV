@@ -14,24 +14,25 @@ using namespace cv;
 
 double generateGaussianNose(double mu, double sigma)
 {
-	//¶¨ÒåÒ»¸öÌØ±ğĞ¡µÄÖµ
-	const double epsilon = numeric_limits<double>::min();//·µ»ØÄ¿±êÊı¾İÀàĞÍÄÜ±íÊ¾µÄ×î±Æ½ü1µÄÕıÊıºÍ1µÄ²îµÄ¾ø¶ÔÖµ
+	//å®šä¹‰ä¸€ä¸ªç‰¹åˆ«å°çš„å€¼
+	const double epsilon = numeric_limits<double>::min();//è¿”å›ç›®æ ‡æ•°æ®ç±»å‹èƒ½è¡¨ç¤ºçš„æœ€é€¼è¿‘1çš„æ­£æ•°å’Œ1çš„å·®çš„ç»å¯¹å€¼
 	static double z0, z1;
 	static bool flag = false;
 	flag = !flag;
-	//flagÎª¼Ù£¬¹¹Ôì¸ßË¹Ëæ»ú±äÁ¿
+	//flagä¸ºå‡ï¼Œæ„é€ é«˜æ–¯éšæœºå˜é‡
 	if (!flag)
 	{
 		return z1 * sigma + mu;
 	}
 	double u1, u2;
-	//¹¹ÔìËæ»ú±äÁ¿
+	//æ„é€ éšæœºå˜é‡
 	do
 	{
 		u1 = rand()*(1.0 / RAND_MAX);
 		u2 = rand()*(1.0 / RAND_MAX);
 	} while (u1 < epsilon);
-	//flagÎªÕæ¹¹Ôì¸ßË¹Ëæ»ú±äÁ¿X
+	//flagä¸ºçœŸæ„é€ é«˜æ–¯éšæœºå˜é‡X
+	//Box-Mullerç®—æ³•ï¼šåˆ©ç”¨ç¬¦åˆå‡åŒ€åˆ†å¸ƒçš„æ•°æ®äº§ç”Ÿé«˜æ–¯åˆ†å¸ƒéšæœºæ•°----https://blog.csdn.net/dreamandxiaochouyu/article/details/45371471
 	z0 = sqrt(-2.0*log(u1))*cos(2 * CV_PI*u2);
 	z1 = sqrt(-2.0*log(u1))*sin(2 * CV_PI*u2);
 	return z1 * sigma + mu;
@@ -39,15 +40,15 @@ double generateGaussianNose(double mu, double sigma)
 
 
 
-//ÎªÍ¼ÏñÌí¼Ó¸ßË¹ÔëÉù
+//ä¸ºå›¾åƒæ·»åŠ é«˜æ–¯å™ªå£°
 void addGaussianNoise(Mat srcImg, Mat& dstImg, double mu, double sigma)
 {
 	dstImg = srcImg.clone();
-	int channels = srcImg.channels();//»ñÈ¡Í¼ÏñµÄÍ¨µÀ
-	int rows = srcImg.rows;			//Í¼ÏñµÄĞĞÊı
-	int cols = srcImg.cols * channels;//Í¼ÏñµÄ×ÜÁĞÊı
-	//ÅĞ¶ÏÍ¼ÏñµÄÁ¬ĞøĞÔ
-	if (srcImg.isContinuous())//ÅĞ¶Ï¾ØÕóÊÇ·ñÁ¬Ğø£¬ÈôÁ¬Ğø£¬ÎÒÃÇÏàµ±ÓÚÖ»ĞèÒª±éÀúÒ»¸öÒ»Î¬Êı×é 
+	int channels = srcImg.channels();//è·å–å›¾åƒçš„é€šé“
+	int rows = srcImg.rows;			//å›¾åƒçš„è¡Œæ•°
+	int cols = srcImg.cols * channels;//å›¾åƒçš„æ€»åˆ—æ•°
+	//åˆ¤æ–­å›¾åƒçš„è¿ç»­æ€§
+	if (srcImg.isContinuous())//åˆ¤æ–­çŸ©é˜µæ˜¯å¦è¿ç»­ï¼Œè‹¥è¿ç»­ï¼Œæˆ‘ä»¬ç›¸å½“äºåªéœ€è¦éå†ä¸€ä¸ªä¸€ç»´æ•°ç»„ 
 	{
 		cols *= rows;
 		rows = 1;
@@ -56,7 +57,7 @@ void addGaussianNoise(Mat srcImg, Mat& dstImg, double mu, double sigma)
 	{
 		for (int j = 0; j < cols; j++)
 		{
-			//Ìí¼Ó¸ßË¹ÔëÉù
+			//æ·»åŠ é«˜æ–¯å™ªå£°
 			double gaussian = generateGaussianNose(mu, sigma) * 32;
 			//printf("gaussian = %.4f\n", gaussian);
 			int val = srcImg.ptr<uchar>(i)[j] + gaussian;
